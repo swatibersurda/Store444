@@ -3,6 +3,8 @@ import ApiResponse from "../Utils/ApiResponse.js";
 import ErrorHandler from "../Utils/ErrorHandler.js";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import nodemailer from "nodemailer";
+import bcrypt from "bcryptjs";
 dotenv.config({ path: "./.env" });
 const genrateTokenMethod = async (userId) => {
   const user = await User.findById(userId);
@@ -69,7 +71,7 @@ export const Logout = async (req, res, next) => {
   if (!existingUser) {
     return next(ErrorHandler("User is unauthorised", 401));
   }
-  const DataTo = await User.findByIdAndUpdate(existingUser?._id, {
+  await User.findByIdAndUpdate(existingUser?._id, {
     $set: {
       acessToken: undefined,
     },
@@ -84,4 +86,74 @@ export const Logout = async (req, res, next) => {
     .json(new ApiResponse("LogedOut Successfully...", {}, 200));
 };
 
-export const RestPassword = async (req, res) => {};
+export const ForgetPassword = async (req, res, next) => {
+  const { email } = req.body;
+  try {
+    if (!email) {
+      return next(new ErrorHandler("Please Fill the Email", 402));
+    }
+    const user = await User.findOne({ email });
+    console.log(user, "i am user");
+    if (!user) {
+      return next(new ErrorHandler("User Not found", 404));
+    }
+    const tokenToSentLink = jwt.sign(
+      { _id: user?._id },
+      process.env.SECRET_KEY,
+      { expiresIn: "10m" }
+    );
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      secure: true,
+      auth: {
+        user: process.env.SENDER_EMAIL,
+        pass: process.env.APP_PASSWORD,
+      },
+    });
+    const reciver = {
+      from: process.env.SENDER_EMAIL,
+      to: email,
+      subject: "Password Reset Request",
+      text: `click on the link ${process.env.RESET_PASSWORD_LINK_WEBSITE}/resetPassword/${tokenToSentLink}`,
+    };
+    transporter.sendMail(reciver);
+    return res
+      .status(200)
+      .json(new ApiResponse("Link sent successfully...", {}, 200));
+  } catch (error) {
+    return next(new ErrorHandler("Internal server error", 500));
+  }
+};
+
+export const ResetPassword = async (req, res, next) => {
+  console.log("i am cmoing on reset password..");
+  const token = req.params.token;
+  console.log(token, "hjghjghj");
+  const passwordNew = req.body.password;
+  try {
+    if (!token) {
+      return next(
+        new ErrorHandler("Unauthorized Access to reset password", 404)
+      );
+    }
+    const verifyToken = jwt.verify(token, process.env.SECRET_KEY);
+    console.log(verifyToken, "i am token");
+    const user = await User.findById(verifyToken?._id);
+    console.log(user, "i am user..");
+    if (!user) {
+      return next(new ErrorHandler("User Not Found", 404));
+    }
+    user.password = passwordNew;
+    console.log(user, "i am after pass");
+    await user.save({ validateBeforeSave: true });
+    const xy = await User.findById(user?._id).select(
+      "-password",
+      "-acessToken"
+    );
+    return res
+      .status(201)
+      .json(new ApiResponse("Password Rested Successfully..", xy, 201));
+  } catch (error) {
+    return next(new ErrorHandler("Internal Error", 500));
+  }
+};
