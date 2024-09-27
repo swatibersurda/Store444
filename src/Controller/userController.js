@@ -137,7 +137,7 @@ export const ResetPassword = async (req, res, next) => {
       );
     }
     const verifyToken = jwt.verify(token, process.env.SECRET_KEY);
-    console.log(verifyToken, "i am token");
+    // console.log(verifyToken, "i am token");
     const user = await User.findById(verifyToken?._id);
     console.log(user, "i am user..");
     if (!user) {
