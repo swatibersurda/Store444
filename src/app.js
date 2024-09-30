@@ -6,6 +6,8 @@ import session from 'express-session';
 import cookieParser from "cookie-parser";
 import { errorMiddleware } from "./Middleware/ErrorMiddleware.js";
 import passport from "passport";
+import { productRouter } from "./Routes/productRouter.js";
+// this is for starting google scope.
 import "./Db/google-auth.js";
 export const app = express();
 app.use(session({
@@ -17,9 +19,11 @@ app.use(session({
 app.use(express.json());
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(express.static("public"));
 // app.use(passport.initialize())
 app.use(morgan("dev"));
 app.use(cookieParser());
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/google", googleRouter);
+app.use("/api/v1/product",productRouter);
 app.use(errorMiddleware);

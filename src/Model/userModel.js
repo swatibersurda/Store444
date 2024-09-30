@@ -10,7 +10,8 @@ const userSchema = new Schema(
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    phone: { type: String},
+    phone: { type: String },
+    role: { type: String, enum: ["Admin", "User"], default: "User" },
     acessToken: { type: String },
   },
   {
@@ -19,7 +20,7 @@ const userSchema = new Schema(
 );
 
 userSchema.pre("save", async function (next) {
-  console.log("i am invoking herer...",this.password)
+  console.log("i am invoking herer...", this.password);
   if (this.isModified("password")) {
     this.password = await bcrypt.hash(this.password, 10);
     next();
@@ -46,7 +47,7 @@ userSchema.methods.genrateToken = async function () {
       phone: this.phone,
     },
     process.env.SECRET_KEY,
-    { expiresIn: '1h'}
+    { expiresIn: process.env.EXPIRES_DAY }
   );
 };
 
