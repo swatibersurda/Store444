@@ -9,6 +9,7 @@ import passport from "passport";
 import { productRouter } from "./Routes/productRouter.js";
 // this is for starting google scope.
 import "./Db/google-auth.js";
+import { orderRouter } from "./Routes/orderRouter.js";
 export const app = express();
 app.use(session({
     secret: 'your-secret-key',  // Replace this with a strong, random secret
@@ -26,4 +27,5 @@ app.use(cookieParser());
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/google", googleRouter);
 app.use("/api/v1/product",productRouter);
+app.use("/api/v1/order",orderRouter)
 app.use(errorMiddleware);

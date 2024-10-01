@@ -4,7 +4,7 @@ import { uploadCloudinary } from "../Utils/Cloudinary.js";
 import ErrorHandler from "../Utils/ErrorHandler.js";
 
 export const addProduct = async (req, res, next) => {
-  //   console.log("reaching here..",req.body)
+    console.log("reaching here..",req.body)
   try {
     const { name, stock, price } = req.body;
     const pic = req.file?.path;
@@ -25,7 +25,7 @@ export const addProduct = async (req, res, next) => {
       .status(201)
       .json(new ApiResponse("Product Added Sucessfully", product, 201));
   } catch (error) {
-    return next(new ErrorHandler("Internal Server Error", 505));
+    return next(new ErrorHandler("Internal Server Error", 500));
   }
 };
 export const getAllProduct = async (req, res, next) => {

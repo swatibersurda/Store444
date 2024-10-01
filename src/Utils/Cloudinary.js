@@ -1,5 +1,4 @@
 import {v2 as cloudiary} from "cloudinary";
-import { log } from "console";
 import fs from "fs";
 import dotenv from "dotenv";
 dotenv.config({path:"./.env"})
@@ -24,7 +23,7 @@ const uploadCloudinary=async(localFilePath)=>{
         })
         console.log(response,"i am responsee..");
         // file has been uploaded sucessfully so need to delete it from server
-        // fs.unlinkSync(localFilePath)
+        fs.unlinkSync(localFilePath)
         return response;
 
     }catch(err){
