@@ -1,7 +1,8 @@
 import express from "express";
-import { addToCart,getCartDataById } from "../Controller/cartController.js";
+import { addToCart,getCartDataById,removeFromCart } from "../Controller/cartController.js";
 export const cartRouter=express.Router();
 cartRouter.route("/addtocart").post(addToCart)
-cartRouter.route("/:id").post(getCartDataById)
+cartRouter.route("/removefromcart").post(removeFromCart)
+cartRouter.route("/:id").get(getCartDataById)
 
 
