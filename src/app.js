@@ -11,6 +11,7 @@ import { productRouter } from "./Routes/productRouter.js";
 import "./Db/google-auth.js";
 import { orderRouter } from "./Routes/orderRouter.js";
 import { cartRouter } from "./Routes/cartRouter.js";
+import path from "path"
 export const app = express();
 app.use(session({
     secret: 'your-secret-key',  // Replace this with a strong, random secret
@@ -18,6 +19,8 @@ app.use(session({
     saveUninitialized: true,    // Save uninitialized sessions
     cookie: { secure: false }   // Use `true` if using HTTPS
   }));
+  // app.set('views', path.join(__dirname, 'views'));
+app.set("view engine","ejs");
 app.use(express.json());
 app.use(passport.initialize());
 app.use(passport.session());
