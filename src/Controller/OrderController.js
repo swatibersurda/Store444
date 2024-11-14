@@ -2,13 +2,16 @@ import { Cart } from "../Model/cartModel.js";
 import { Order } from "../Model/orderModel.js";
 import { Product } from "../Model/productModel.js";
 import ErrorHandler from "../Utils/ErrorHandler.js";
+import ejs from "ejs";
 import dotenv from "dotenv";
 dotenv.config({ path: "./.env" });
 import pdf from "html-pdf";
 import path from "path";
 import nodemailer from "nodemailer";
+import puppeteer from "puppeteer";
 // import { header } from "express/lib/request.js";
 import { User } from "../Model/userModel.js";
+import ApiResponse from "../Utils/ApiResponse.js";
 console.log(process.env.SENDER_EMAIL, "i am at line 10 ");
 
 const transporter = nodemailer.createTransport({
@@ -66,49 +69,52 @@ export const placeOrder = async (req, res, next) => {
     const userSentEmail = await User.findById({ _id: userId });
     console.log(userSentEmail, "user email address..");
     console.log(userToEjs, "i am order");
-    return res.render(
-      path.join(__dirname, "../views/", "Bill.ejs", { user: "nbnd" })
+    const htmlContent = await ejs.renderFile(
+      path.join("src/views", "index.ejs"),
+      { data: sendUser }
     );
-    // return res.renderFile(path.join(__dirname,"views","Bill.ejs"))
-    // ejs.renderFile(path.join(__dirname, 'views', 'Bill.ejs'), data, (err, html) => {
-    //   if (err) {
-    //     console.error(err);
-    //     return;
-    //   }
-    //   // Use the HTML output here
-    // });
+    console.log(htmlContent, "i am html contentt..");
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
 
-    // const htmlContent = await ejs.renderFile(path.join(__dirname,"./views/", 'Bill.ejs'), {user:"Data"});
-    // console.log(htmlContent,"i am html contentt..")
-    // const pdfOptions={format:"A4"};
-    // pdf.create(htmlContent, pdfOptions).toBuffer(async (err, pdfBuffer) => {
-    //   if (err) {
-    //     console.error('Failed to generate PDF:', err);
-    //     return;
-    //   }
-    //   const mailOptions = {
-    //     from: process.env.SENDER_EMAIL,
-    //     to: "swatibersurda@gmail.com",
-    //     subject: 'Your PDF Document',
-    //     text: 'Please find the attached PDF.',
-    //     attachments: [
-    //       {
-    //         filename: 'document.pdf',
-    //         content: pdfBuffer,
-    //         contentType: 'application/pdf',
-    //       },
-    //     ],
-    //   };
+    // Set the HTML content in the page
+    await page.setContent(htmlContent, { waitUntil: "networkidle0" });
 
-    //   // Step 5: Send the email
-    //   transporter.sendMail(mailOptions, (error, info) => {
-    //     if (error) {
-    //       console.error('Error sending email:', error);
-    //     } else {
-    //       console.log('Email sent:', info.response);
-    //     }
-    //   });
+    // Generate PDF
+    const pdfBuffer = await page.pdf({ format: "A4" });
+    console.log(pdfBuffer, "i am pdfBuffer");
+
+    // Close the browser
+    await browser.close();
+
+    // return pdfBuffer;
+    const mailOptions = {
+      from: process.env.SENDER_EMAIL,
+      to: "swatibersurda@gmail.com",
+      subject: "Your PDF Document",
+      text: "Please find the attached PDF.",
+      attachments: [
+        {
+          filename: "document.pdf",
+          content: pdfBuffer,
+          contentType: "application/pdf",
+        },
+      ],
+    };
+
+    // Step 5: Send the email
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error("Error sending email:", error);
+      } else {
+        console.log("Email sent:", info.response);
+      }
+    });
     // });
+    cart.items = [];
+    cart.totalAmount = 0;
+    await cart.save();
+    // return res.json(new ApiResponse("sent sucesfully", sendUser, 200));
   } catch (error) {
     res.status(500).send("Internal server error");
   }
@@ -129,3 +135,7 @@ const updateStock = async (productId, stockToUpdate) => {
 };
 
 // this is admin only routes...
+
+export const ejsFun = async (req, res, next) => {
+  return res.render("index");
+};

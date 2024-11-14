@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+</head>
+
+<body>
+    <b>
+        bccdb
+    </b>
+    <%= data.shippingInfo.address%>
+    <table>
+        <thead>
+            <tr>
+                <th> Product Name</th>
+                <th>Price</th>
+                <th>quantity</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% data.items.forEach(item => { %>
+                <tr>
+                    <td><%= item.productId.name %></td>
+                    <td><%= item.productId.price %></td>
+                    <td><%= item.quantity %></td>
+                    <td><%= item.productId.price * item.quantity %></td>
+                    <td><img src="<%= item.productId.pic %>" alt="<%= item.productId.name %>" width="100"></td>
+                </tr>
+            <% }) %>
+
+        </tbody>
+    </table>
+
+</body>
+
+</html>
