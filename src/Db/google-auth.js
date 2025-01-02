@@ -17,7 +17,8 @@ passport.use(new GoogleStrategy({
     console.log(profile?._json.email ,"gg")
     // return done(null, user);
     let user=await User.findOne({email:profile?._json.email})
-    console.log(user,"iam found")
+    console.log(user,"iam found on databasess...")
+    // will create the user.
     if(!user){
       user=await User.create({
         name:profile._json.name,

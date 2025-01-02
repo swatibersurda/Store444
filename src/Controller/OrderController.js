@@ -51,6 +51,10 @@ export const placeOrder = async (req, res, next) => {
     });
 
     await newOrder.save();
+    // 1st step stripe payment
+    // 2nd step create ejs file
+    // 3rd step pdf create
+    // 4th step node mailer sent mail.
     // sconsole.log(newOrder);
     const xy = cart.items.forEach((item) =>
       updateStock(item.productId._id, item.quantity)
@@ -59,62 +63,59 @@ export const placeOrder = async (req, res, next) => {
       path: "items.productId",
       select: "-stock",
     });
+    console.log(sendUser, "i am sendUserr...");
+    // here we will again do query and then after that will send it to create the pdf and from that ejs file.
+    const userToEjs = await Order.findOne({ userId });
+    // console.log(userToEjs, "i am userToejss....");
+    // const userSentEmail = await User.findById({ _id: userId });
+    // console.log(userSentEmail, "user email address..");
+    // console.log(userToEjs, "i am order");
+    // const htmlContent = await ejs.renderFile(
+    //   path.join("src/views", "index.ejs"),
+    //   { data: sendUser }
+    // );
+    // console.log(htmlContent, "i am html contentt..");
+    // const browser = await puppeteer.launch();
+    // const page = await browser.newPage();
 
+    // // Set the HTML content in the page
+    // await page.setContent(htmlContent, { waitUntil: "networkidle0" });
+
+    // // Generate PDF
+    // const pdfBuffer = await page.pdf({ format: "A4" });
+    // console.log(pdfBuffer, "i am pdfBuffer");
+
+    // // Close the browser
+    // await browser.close();
+
+    // return pdfBuffer;
+    // const mailOptions = {
+    //   from: process.env.SENDER_EMAIL,
+    //   to: "swatibersurda@gmail.com",
+    //   subject: "Your PDF Document",
+    //   text: "Please find the attached PDF.",
+    //   attachments: [
+    //     {
+    //       filename: "document.pdf",
+    //       content: pdfBuffer,
+    //       contentType: "application/pdf",
+    //     },
+    //   ],
+    // };
+
+    // Step 5: Send the email
+    // transporter.sendMail(mailOptions, (error, info) => {
+    //   if (error) {
+    //     console.error("Error sending email:", error);
+    //   } else {
+    //     console.log("Email sent:", info.response);
+    //   }
+    // });
+    // });
     // cart.items = [];
     // cart.totalAmount = 0;
     // await cart.save();
-    // here we will again do query and then after that will send it to create the pdf and from that ejs file.
-    const userToEjs = await Order.findOne({ userId });
-    console.log(userToEjs, "i am userToejss....");
-    const userSentEmail = await User.findById({ _id: userId });
-    console.log(userSentEmail, "user email address..");
-    console.log(userToEjs, "i am order");
-    const htmlContent = await ejs.renderFile(
-      path.join("src/views", "index.ejs"),
-      { data: sendUser }
-    );
-    console.log(htmlContent, "i am html contentt..");
-    const browser = await puppeteer.launch();
-    const page = await browser.newPage();
-
-    // Set the HTML content in the page
-    await page.setContent(htmlContent, { waitUntil: "networkidle0" });
-
-    // Generate PDF
-    const pdfBuffer = await page.pdf({ format: "A4" });
-    console.log(pdfBuffer, "i am pdfBuffer");
-
-    // Close the browser
-    await browser.close();
-
-    // return pdfBuffer;
-    const mailOptions = {
-      from: process.env.SENDER_EMAIL,
-      to: "swatibersurda@gmail.com",
-      subject: "Your PDF Document",
-      text: "Please find the attached PDF.",
-      attachments: [
-        {
-          filename: "document.pdf",
-          content: pdfBuffer,
-          contentType: "application/pdf",
-        },
-      ],
-    };
-
-    // Step 5: Send the email
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error("Error sending email:", error);
-      } else {
-        console.log("Email sent:", info.response);
-      }
-    });
-    // });
-    cart.items = [];
-    cart.totalAmount = 0;
-    await cart.save();
-    // return res.json(new ApiResponse("sent sucesfully", sendUser, 200));
+    return res.json(new ApiResponse("sent sucesfully", sendUser, 200));
   } catch (error) {
     res.status(500).send("Internal server error");
   }

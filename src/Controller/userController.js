@@ -109,8 +109,8 @@ export const ForgetPassword = async (req, res, next) => {
         user: process.env.SENDER_EMAIL,
         pass: process.env.APP_PASSWORD,
       },
-      logger:true,
-      debug:true
+      logger: true,
+      debug: true,
     });
     const reciver = {
       from: process.env.SENDER_EMAIL,

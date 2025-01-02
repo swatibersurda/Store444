@@ -1,5 +1,6 @@
 import { userRouter } from "./Routes/userRouter.js";
 import { googleRouter } from "./Routes/googleRouter.js";
+import cors from "cors";
 import express from "express";
 import morgan from "morgan";
 import session from "express-session";
@@ -20,6 +21,7 @@ import { dirname } from "path";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 export const app = express();
+app.use(cors());
 app.use(
   session({
     secret: "your-secret-key", // Replace this with a strong, random secret
