@@ -36,18 +36,23 @@ export const Register = async (req, res, next) => {
 };
 export const Login = async (req, res, next) => {
   const { email, password } = req.body;
+  // console.log(email,password,"i am password")
   let existingUser;
   existingUser = await User.findOne({ email });
+  // console.log(existingUser,"i am existingUser")
   if (!existingUser) {
-    return next(new ErrorHandler("User or email Already Exist", 404));
+    return next(new ErrorHandler("User or email not Already Exist", 404));
   }
   try {
+    console.log("entering in login partt...")
     const passWordCheck = await existingUser.isPasswordCorrect(password);
+    // console.log(passWordCheck,"i am password")
     if (!passWordCheck) {
       return next(ErrorHandler("UserName and Password is Incorrect", 400));
     }
 
     const { token } = await genrateTokenMethod(existingUser?._id);
+
 
     existingUser.acessToken = token;
     await existingUser.save({ validateBeforeSave: false });
@@ -55,6 +60,7 @@ export const Login = async (req, res, next) => {
       httpOnly: true,
       secure: true,
     };
+    console.log(existingUser,"i am")
     const data = await User.findById(existingUser?._id);
     return res
       .status(200)

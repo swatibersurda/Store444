@@ -21,7 +21,7 @@ import { dirname } from "path";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 export const app = express();
-app.use(cors());
+app.use(cors({origin:'http://localhost:5173'}));
 app.use(
   session({
     secret: "your-secret-key", // Replace this with a strong, random secret

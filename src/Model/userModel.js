@@ -20,7 +20,7 @@ const userSchema = new Schema(
 );
 
 userSchema.pre("save", async function (next) {
-  console.log("i am invoking herer...", this.password);
+  // console.log("i am invoking herer...", this.password);
   if (this.isModified("password")) {
     this.password = await bcrypt.hash(this.password, 10);
     next();
@@ -35,6 +35,7 @@ userSchema.methods.validatePassword = async function (password) {
 };
 
 userSchema.methods.isPasswordCorrect = async function (password) {
+  console.log("i am reaching at ispasswordCorrect....",password)
   return await bcrypt.compare(password, this.password);
 };
 
