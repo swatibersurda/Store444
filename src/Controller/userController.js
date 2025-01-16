@@ -122,7 +122,7 @@ export const ForgetPassword = async (req, res, next) => {
       from: process.env.SENDER_EMAIL,
       to: email,
       subject: "Password Reset Request",
-      text: `click on the link ${process.env.RESET_PASSWORD_LINK_WEBSITE}/resetPassword/${tokenToSentLink}`,
+      text: `click on the link ${process.env.RESET_PASSWORD_LINK_WEBSITE}/changepass/${tokenToSentLink}`,
     };
     transporter.sendMail(reciver);
     return res
@@ -165,3 +165,12 @@ export const ResetPassword = async (req, res, next) => {
     return next(new ErrorHandler("Internal Error", 500));
   }
 };
+export const findUserByToken=async(req,res)=>{
+  const {token}=req.body
+  const user=await User.findOne({acessToken:token})
+  console.log(user,"i am found")
+    if(!user){
+      return next(new ErrorHandler("User Not Found",404))
+    }
+  return res.status(200).json(new ApiResponse("User Found",user,200))
+}
