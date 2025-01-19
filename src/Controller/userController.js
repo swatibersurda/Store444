@@ -44,7 +44,7 @@ export const Login = async (req, res, next) => {
     return next(new ErrorHandler("User or email not Already Exist", 404));
   }
   try {
-    console.log("entering in login partt...")
+    console.log("entering in login partt...");
     const passWordCheck = await existingUser.isPasswordCorrect(password);
     // console.log(passWordCheck,"i am password")
     if (!passWordCheck) {
@@ -53,14 +53,13 @@ export const Login = async (req, res, next) => {
 
     const { token } = await genrateTokenMethod(existingUser?._id);
 
-
     existingUser.acessToken = token;
     await existingUser.save({ validateBeforeSave: false });
     const options = {
       httpOnly: true,
       secure: true,
     };
-    console.log(existingUser,"i am")
+    console.log(existingUser, "i am");
     const data = await User.findById(existingUser?._id);
     return res
       .status(200)
@@ -134,10 +133,11 @@ export const ForgetPassword = async (req, res, next) => {
 };
 
 export const ResetPassword = async (req, res, next) => {
-  console.log("i am cmoing on reset password..");
+  console.log("i am cmoing on reset password..", req.body);
   const token = req.params.token;
   console.log(token, "hjghjghj");
   const passwordNew = req.body.password;
+  console.log(passwordNew,"i am password news")
   try {
     if (!token) {
       return next(
@@ -145,19 +145,23 @@ export const ResetPassword = async (req, res, next) => {
       );
     }
     const verifyToken = jwt.verify(token, process.env.SECRET_KEY);
-    // console.log(verifyToken, "i am token");
+    console.log(verifyToken, "i am token");
     const user = await User.findById(verifyToken?._id);
     console.log(user, "i am user..");
+    if(req.body.email!==user.email){
+      return next(new ErrorHandler("email associated the password is not same Please provide correct email"))
+    }
     if (!user) {
       return next(new ErrorHandler("User Not Found", 404));
     }
+    // need to hash the password as well
     user.password = passwordNew;
     console.log(user, "i am after pass");
-    await user.save({ validateBeforeSave: true });
-    const xy = await User.findById(user?._id).select(
-      "-password",
-      "-acessToken"
-    );
+    // here password should be encrypted because password is getting modifiedd...
+    const df = await user.save({ validateBeforeSave: true });
+    //  console.log(df,"i am df")
+    const xy = await User.findById(df?._id);
+    console.log(xy, "i am xy");
     return res
       .status(201)
       .json(new ApiResponse("Password Rested Successfully..", xy, 201));
@@ -165,12 +169,12 @@ export const ResetPassword = async (req, res, next) => {
     return next(new ErrorHandler("Internal Error", 500));
   }
 };
-export const findUserByToken=async(req,res)=>{
-  const {token}=req.body
-  const user=await User.findOne({acessToken:token})
-  console.log(user,"i am found")
-    if(!user){
-      return next(new ErrorHandler("User Not Found",404))
-    }
-  return res.status(200).json(new ApiResponse("User Found",user,200))
-}
+export const findUserByToken = async (req, res) => {
+  const { token } = req.body;
+  const user = await User.findOne({ acessToken: token });
+  console.log(user, "i am found");
+  if (!user) {
+    return next(new ErrorHandler("User Not Found", 404));
+  }
+  return res.status(200).json(new ApiResponse("User Found", user, 200));
+};

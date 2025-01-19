@@ -20,9 +20,10 @@ const userSchema = new Schema(
 );
 
 userSchema.pre("save", async function (next) {
-  // console.log("i am invoking herer...", this.password);
+  console.log("i am invoking herer...", this.password);
   if (this.isModified("password")) {
     this.password = await bcrypt.hash(this.password, 10);
+    console.log(this.password)
     next();
   }
   return next();
