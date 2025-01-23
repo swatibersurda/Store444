@@ -5,4 +5,5 @@ import { AdminOnly } from "../Middleware/adminMiddleware.js";
 // console.log(upload, "i am uploadd");
 export const productRouter = express.Router();
 productRouter.route("/addProduct").post(AdminOnly,upload.single("pic"), addProduct);
-productRouter.route("/getProduct").get(AdminOnly,getAllProduct);
+// THESE PRODUCT WILL BE VISIBLE TO EVERYONE..
+productRouter.route("/getProduct").get(getAllProduct);

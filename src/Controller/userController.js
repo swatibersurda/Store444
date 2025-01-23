@@ -137,7 +137,7 @@ export const ResetPassword = async (req, res, next) => {
   const token = req.params.token;
   console.log(token, "hjghjghj");
   const passwordNew = req.body.password;
-  console.log(passwordNew,"i am password news")
+  console.log(passwordNew, "i am password news");
   try {
     if (!token) {
       return next(
@@ -148,8 +148,12 @@ export const ResetPassword = async (req, res, next) => {
     console.log(verifyToken, "i am token");
     const user = await User.findById(verifyToken?._id);
     console.log(user, "i am user..");
-    if(req.body.email!==user.email){
-      return next(new ErrorHandler("email associated the password is not same Please provide correct email"))
+    if (req.body.email !== user.email) {
+      return next(
+        new ErrorHandler(
+          "email associated the password is not same Please provide correct email"
+        )
+      );
     }
     if (!user) {
       return next(new ErrorHandler("User Not Found", 404));
