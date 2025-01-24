@@ -133,7 +133,7 @@ export const ForgetPassword = async (req, res, next) => {
 };
 
 export const ResetPassword = async (req, res, next) => {
-  console.log("i am cmoing on reset password..", req.body);
+  // console.log("i am cmoing on reset password..", req.body);
   const token = req.params.token;
   console.log(token, "hjghjghj");
   const passwordNew = req.body.password;

@@ -131,8 +131,9 @@ export const removeFromCart = async (req, res, next) => {
 
 export const getCartDataById = async (req, res, next) => {
   const { id } = req.params;
+  console.log(id,"i am id")
   try {
-    const user = await Cart.findOne({ userId: id });
+    const user = await Cart.findOne({ userId: id }).populate('items.productId');
     console.log(user, "i am userr...");
     if (!user) {
       return next(new ErrorHandler("User not found to show the cart", 404));
@@ -141,6 +142,6 @@ export const getCartDataById = async (req, res, next) => {
       .status(200)
       .json(new ApiResponse("Cart Fetched Successfully...", user, 200));
   } catch (error) {
-    return next(ErrorHandler("Internal Error", 500));
+    return next(new ErrorHandler("Internal Error", 500));
   }
 };
