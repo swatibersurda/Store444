@@ -6,8 +6,10 @@ import ErrorHandler from "../Utils/ErrorHandler.js";
 // work on cart total...
 export const addToCart = async (req, res, next) => {
   const { userId, productId, quantity } = req.body;
+  console.log(req.body,"i am req bodyyy")
   try {
     const product = await Product.findById(productId);
+    console.log(product,"i am ")
     if (!product) {
       return next(new ErrorHandler("Product Not Found", 404));
     }
@@ -36,7 +38,7 @@ export const addToCart = async (req, res, next) => {
     } else {
       cart.items.push({ productId, quantity });
     }
-    // console.log(cart, "i am items before save...");
+    console.log(cart, "i am items before save...");
     await cart.save();
     // console.log(cart, "i am cart sfeter save in databasee...");
     // let updatedCart = await Cart.findOne({ userId }).populate("items.productId");
@@ -54,10 +56,11 @@ export const addToCart = async (req, res, next) => {
       (sum, item) => sum + item.quantity * item.productId.price,
       0
     );
-    // console.log(updatedCart.totalAmount, "i am total");
+    console.log(updatedCart.totalAmount, "i am total");
 
     await updatedCart.save();
     let userCart = await Cart.findOne({ userId }).populate("items.productId");
+    console.log(userCart,"i am onnnn")
 
     return res
       .status(201)
@@ -70,6 +73,7 @@ export const addToCart = async (req, res, next) => {
 export const removeFromCart = async (req, res, next) => {
   // console.log("reaching herer", "i am reaching here..", req.body);
   const { userId, productId, quantity } = req.body;
+  console.log(req.body)
   try {
     const product = await Product.findById(productId);
     if (!product) {
@@ -104,23 +108,25 @@ export const removeFromCart = async (req, res, next) => {
       cart.items = cartm;
       await cart.save();
     }
-    console.log("i am cart befre save.,cmd,");
+    console.log("i am cart befre save.,cmd,",cart);
     let updatedCart = await Cart.findOne({ userId }).populate(
       "items.productId"
     );
-    // console.log(updatedCart, "i am updatedCarttt..");
+    console.log(updatedCart, "i am updatedCarttt..");
     updatedCart.totalAmount = updatedCart.items.reduce(
       (sum, item) => sum + item.quantity * item.productId.price,
       0
     );
-    // console.log(updatedCart.totalAmount, "i am total");
+    console.log(updatedCart.totalAmount, "i am total");
     await updatedCart.save();
+    let xy=await Cart.findOne({userId}).populate("items.productId")
+    console.log(xy,"xyy")
     return res
       .status(201)
       .json(
         new ApiResponse(
           !quantity ? "Product Removed Sucessfully" : "Reduced quantity",
-          updatedCart,
+          xy,
           201
         )
       );
@@ -130,10 +136,11 @@ export const removeFromCart = async (req, res, next) => {
 };
 
 export const getCartDataById = async (req, res, next) => {
+  console.log("reaching here")
   const { id } = req.params;
-  console.log(id,"i am id")
+  console.log(id, "i am id");
   try {
-    const user = await Cart.findOne({ userId: id }).populate('items.productId');
+    const user = await Cart.findOne({ userId:id }).populate("items.productId");
     console.log(user, "i am userr...");
     if (!user) {
       return next(new ErrorHandler("User not found to show the cart", 404));
