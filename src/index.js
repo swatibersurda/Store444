@@ -2,7 +2,6 @@ import { app } from "./app.js";
 import { connect } from "./Db/connect.js";
 import dotenv from "dotenv";
 dotenv.config({path:"/.env"})
-console.log(process.env.PORT)
 
 connect().then(()=>{
     app.on("error",((error)=>{

@@ -21,7 +21,7 @@ const uploadCloudinary=async(localFilePath)=>{
             // pdf,image,avatar any file--->auto.
             resource_type:"auto"
         })
-        console.log(response,"i am responsee..");
+
         // file has been uploaded sucessfully so need to delete it from server
         fs.unlinkSync(localFilePath)
         return response;

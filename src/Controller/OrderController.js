@@ -4,15 +4,17 @@ import { Product } from "../Model/productModel.js";
 import ErrorHandler from "../Utils/ErrorHandler.js";
 import ejs from "ejs";
 import dotenv from "dotenv";
+import Stripe from "stripe";
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
 dotenv.config({ path: "./.env" });
 import pdf from "html-pdf";
 import path from "path";
 import nodemailer from "nodemailer";
 import puppeteer from "puppeteer";
-// import { header } from "express/lib/request.js";
 import { User } from "../Model/userModel.js";
 import ApiResponse from "../Utils/ApiResponse.js";
-console.log(process.env.SENDER_EMAIL, "i am at line 10 ");
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -24,19 +26,47 @@ const transporter = nodemailer.createTransport({
 });
 
 export const placeOrder = async (req, res, next) => {
-  console.log(req.body);
   const { userId } = req.body;
   const { address, city, state, country, pinCode } = req.body.shippingInfo;
 
   try {
-    const cart = await Cart.findOne({ userId });
-    console.log(cart, "i am carttt...", cart.items.length);
+    const cart = await Cart.findOne({ userId }).populate("items.productId");
     if (!cart || cart.items.length === 0) {
-      // console.log("i am reaching here..");
       return next(new ErrorHandler("Cart is empty", 404));
     }
 
-    // Create new order
+
+    const lineItems = cart.items.map((item) => ({
+      
+      price_data: {
+        currency: "inr",
+        product_data: {
+          name: item.productId.name,
+          images: [item.productId.pic], // Ensure your product model has an 'image' field
+        },
+        unit_amount: Math.round(item.productId.price * 100), // Convert price to cents
+        // unit_amount: item.productId.price , // Convert price to cents
+      },
+      quantity: item.quantity,
+    }));
+    // Create Stripe Checkout Session
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: lineItems,
+      mode: "payment",
+      success_url: `${process.env.RESET_PASSWORD_LINK_WEBSITE}success`,
+      cancel_url:`${process.env.RESET_PASSWORD_LINK_WEBSITE}cart`,
+      customer_email: (await User.findById(userId)).email,
+      shipping_address_collection: {
+        allowed_countries: ['IN'], 
+      },
+      metadata: {
+        userId,
+        shippingInfo: JSON.stringify(req.body.shippingInfo),
+      },
+    });
+    // tripe payment ateway
+    //   // Create new order
     const newOrder = new Order({
       userId,
       items: cart.items,
@@ -49,89 +79,80 @@ export const placeOrder = async (req, res, next) => {
         pinCode: pinCode,
       },
     });
-
-    await newOrder.save();
+   
+   let datam= await newOrder.save();
     // 1st step stripe payment
     // 2nd step create ejs file
     // 3rd step pdf create
     // 4th step node mailer sent mail.
-    // sconsole.log(newOrder);
+    
     const xy = cart.items.forEach((item) =>
       updateStock(item.productId._id, item.quantity)
     );
-    let sendUser = await Order.findOne({ userId }).populate({
+    // we need to send that order which we saved then need to send it for pdf creation.
+    let sendUser = await Order.findOne({ _id:datam?._id }).populate({
       path: "items.productId",
       select: "-stock",
     });
-    console.log(sendUser, "i am sendUserr...");
-    // here we will again do query and then after that will send it to create the pdf and from that ejs file.
-    const userToEjs = await Order.findOne({ userId });
-    // console.log(userToEjs, "i am userToejss....");
-    // const userSentEmail = await User.findById({ _id: userId });
-    // console.log(userSentEmail, "user email address..");
-    // console.log(userToEjs, "i am order");
-    // const htmlContent = await ejs.renderFile(
-    //   path.join("src/views", "index.ejs"),
-    //   { data: sendUser }
-    // );
-    // console.log(htmlContent, "i am html contentt..");
-    // const browser = await puppeteer.launch();
-    // const page = await browser.newPage();
+    
+    const userSentEmail = await User.findById({ _id: userId });
+    const htmlContent = await ejs.renderFile(
+      path.join("src/views", "index.ejs"),
+      { data: sendUser }
+    );
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
 
     // // Set the HTML content in the page
-    // await page.setContent(htmlContent, { waitUntil: "networkidle0" });
+    await page.setContent(htmlContent, { waitUntil: "networkidle0" });
 
     // // Generate PDF
-    // const pdfBuffer = await page.pdf({ format: "A4" });
-    // console.log(pdfBuffer, "i am pdfBuffer");
+    const pdfBuffer = await page.pdf({ format: "A4" });
 
     // // Close the browser
-    // await browser.close();
+    await browser.close();
 
     // return pdfBuffer;
-    // const mailOptions = {
-    //   from: process.env.SENDER_EMAIL,
-    //   to: "swatibersurda@gmail.com",
-    //   subject: "Your PDF Document",
-    //   text: "Please find the attached PDF.",
-    //   attachments: [
-    //     {
-    //       filename: "document.pdf",
-    //       content: pdfBuffer,
-    //       contentType: "application/pdf",
-    //     },
-    //   ],
-    // };
+    const mailOptions = {
+      from: process.env.SENDER_EMAIL,
+      to: userSentEmail.email,
+      subject: "Your PDF Document",
+      text: "Please find the attached PDF.",
+      attachments: [
+        {
+          filename: "document.pdf",
+          content: pdfBuffer,
+          contentType: "application/pdf",
+        },
+      ],
+    };
 
     // Step 5: Send the email
-    // transporter.sendMail(mailOptions, (error, info) => {
-    //   if (error) {
-    //     console.error("Error sending email:", error);
-    //   } else {
-    //     console.log("Email sent:", info.response);
-    //   }
-    // });
-    // });
-    // cart.items = [];
-    // cart.totalAmount = 0;
-    // await cart.save();
-    return res.json(new ApiResponse("sent sucesfully", sendUser, 200));
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error("Error sending email:", error);
+      } else {
+        console.log("Email sent:", info.response);
+      }
+    });
+
+    cart.items = [];
+    cart.totalAmount = 0;
+    await cart.save();
+    return res.json(new ApiResponse("order placed succesfully.....", {id:session.id}, 200));
   } catch (error) {
-    res.status(500).send("Internal server error");
+    return next(new ErrorHandler("internal server error", 500));
   }
 };
 
 const updateStock = async (productId, stockToUpdate) => {
   // first find the product
-  // console.log(productId, stockToUpdate, "i am reaching here");
   const product = await Product.findById(productId);
-  console.log(product, "i am found productt..");
   if (!product) {
     return next(new ErrorHandler("Product Not Found", 404));
   }
   // this will update the stock...
   product.stock = product.stock - stockToUpdate;
-  console.log(product, "product After ");
   await product.save();
 };
 
@@ -139,4 +160,4 @@ const updateStock = async (productId, stockToUpdate) => {
 
 export const ejsFun = async (req, res, next) => {
   return res.render("index");
-};
+}

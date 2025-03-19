@@ -23,7 +23,6 @@ failureRedirect: "http://localhost:5173/login",
 export const postAuthMiddleware = async (req, res, next) => {
   let user;
   user = await User.findById(req.user?._id);
-  console.log(user, "i am at postMiddleware");
 
   if (!user) {
     return next(new ErrorHandler("User Not Found", 404));
@@ -38,16 +37,14 @@ export const postAuthMiddleware = async (req, res, next) => {
   );
   // it will basically create a entire fresh token whether the user is in db or not as
   user.acessToken = token;
-  await user.save({ validateBeforeSave: false });
-  console.log(user, "i am users after acessToken");
-  console.log(user, "i am users after acessToken");
+  await user.save({ validateBeforeSave: true });
+  req.user.acessToken=token
   next();
 };
 
 export const redirecting = async (req, res, next) => {
-  // console.log(req.session.user,"i am sess")
   const {acessToken}=req.user
   // from this acess token we will find the user and save of redux 
-  res.redirect(`http://localhost:5173/?token=${acessToken}`);
+  res.redirect(`${process.env.RESET_PASSWORD_LINK_WEBSITE}?token=${acessToken}`);
 };
 

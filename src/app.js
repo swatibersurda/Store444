@@ -21,7 +21,26 @@ import { dirname } from "path";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 export const app = express();
-app.use(cors({origin:'http://localhost:5173'}));
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://majestic-swan-b4a48f.netlify.app',
+  'https://beautiful-mooncake-72d235.netlify.app'
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true,
+  })
+);
+
+// app.use(cors({origin:'http://localhost:5173',credentials:true}));
 app.use(
   session({
     secret: "your-secret-key", // Replace this with a strong, random secret

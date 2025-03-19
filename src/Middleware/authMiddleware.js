@@ -7,7 +7,7 @@ dotenv.config({ path: "./.env" });
 export const verifyJWT = async (req, res, next) => {
   try {
     const token =
-      req.cookies?.accessToken || req.header("Authorization")?.split(" ")[1];
+      req.cookies?.acessToken || req.header("Authorization")?.split(" ")[1];
     if (!token) {
       return next(new ErrorHandler("Internal Server error..", 500));
     }

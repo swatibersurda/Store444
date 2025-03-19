@@ -13,11 +13,9 @@ passport.use(new GoogleStrategy({
   callbackURL: "http://localhost:9000/api/v1/google/auth/google/callback",
 }, async (accessToken, refreshToken, profile, done) => {
   try {
-   console.log(profile)
-    console.log(profile?._json.email ,"gg")
+   
     // return done(null, user);
     let user=await User.findOne({email:profile?._json.email})
-    console.log(user,"iam found on databasess...")
     // will create the user.
     if(!user){
       user=await User.create({

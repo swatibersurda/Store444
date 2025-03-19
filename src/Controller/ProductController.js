@@ -4,16 +4,13 @@ import { uploadCloudinary } from "../Utils/Cloudinary.js";
 import ErrorHandler from "../Utils/ErrorHandler.js";
 
 export const addProduct = async (req, res, next) => {
-    console.log("reaching here..",req.body)
   try {
     const { name, stock, price } = req.body;
     const pic = req.file?.path;
-    //   console.log(pic, "iam pic");
     if (!pic) {
       return next(ErrorHandler("Product Pic is Required to Upload."));
     }
     const picLink = await uploadCloudinary(pic);
-    console.log(picLink, "i am pickii...");
     const product = await Product.create({
       name,
       stock,
