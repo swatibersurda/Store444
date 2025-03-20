@@ -10,8 +10,8 @@ passport.use(new GoogleStrategy({
   clientID: process.env.CLIENT_ID,
   clientSecret: process.env.CLIENT_SECRET,
   // this url is given on redirect timeee..
-  // callbackURL: "http://localhost:9000/api/v1/google/auth/google/callback",
-  callbackURL: "https://ecommdoorstep.onrender.com/api/v1/google/auth/google",
+  callbackURL: "http://localhost:9000/api/v1/google/auth/google/callback",
+  // callbackURL: "https://ecommdoorstep.onrender.com/api/v1/google/auth/google",
 }, async (accessToken, refreshToken, profile, done) => {
   try {
    
