@@ -14,7 +14,7 @@ passport.use(new GoogleStrategy({
   callbackURL: "https://ecommdoorstep.onrender.com/api/v1/google/auth/google/callback",
 }, async (accessToken, refreshToken, profile, done) => {
   try {
-   
+   console("hi")
     // return done(null, user);
     let user=await User.findOne({email:profile?._json.email})
     // will create the user.
