@@ -17,7 +17,7 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        console.log(profile,"i am profile")
+        console.log(profile,"i am profilenn")
         // console("hi nn");
         // return done(null, user);
         let user = await User.findOne({ email: profile?._json.email });
