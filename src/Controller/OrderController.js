@@ -100,67 +100,72 @@ export const placeOrder = async (req, res, next) => {
     const userSentEmail = await User.findById({ _id: userId });
     console.log("i am 101",session?.id)
 
-    const htmlContent = await ejs.renderFile(
-      path.join("src/views", "index.ejs"),
-      { data: sendUser }
-    );   
-    console.log("i am 107777",session?.id)
-     const browser = await puppeteer.launch();
-    console.log("i am 108",session?.id)
-    const page = await browser.newPage();
-    console.log("i am 110",session?.id)
+    // const htmlContent = await ejs.renderFile(
+    //   path.join("src/views", "index.ejs"),
+    //   { data: sendUser }
+    // );   
+    // console.log("i am 107777",session?.id)
     
-    // // Set the HTML content in the page
-    await page.setContent(htmlContent, { waitUntil: "networkidle0" });
-    console.log("i am 110",session?.id)
-    
-    // // Generate PDF
-    const pdfBuffer = await page.pdf({ format: "A4" });
-    // // Close the browser
-    await browser.close();
-    console.log("i am 116",session?.id)
-    // return pdfBuffer;
-    // const browser = await puppeteer.launch({
-    //   executablePath: process.env.CHROMIUM_PATH || "/usr/bin/chromium",
+    //  const browser = await puppeteer.launch({
+    //   executablePath: '/usr/bin/chromium', // Path for Chromium in Ubuntu/Debian-based servers
     //   args: ['--no-sandbox', '--disable-setuid-sandbox'],
     //   headless: true,
     // });
-    // console.log("Browser launched successfully.",session.id);
-    
+    // console.log("i am 108",session?.id)
     // const page = await browser.newPage();
-    // console.log("New page created.",session.id);
-  
+    // console.log("i am 110",session?.id)
+    
+    // // // Set the HTML content in the page
     // await page.setContent(htmlContent, { waitUntil: "networkidle0" });
-    // console.log("HTML content set.",session.id);
-  
+    // console.log("i am 110",session?.id)
+    
+    // // // Generate PDF
     // const pdfBuffer = await page.pdf({ format: "A4" });
-    // console.log("PDF generated successfully.",session.id);
-  
+    // // // Close the browser
     // await browser.close();
-    const mailOptions = {
-      from: process.env.SENDER_EMAIL,
-      to: userSentEmail.email,
-      subject: "Your PDF Document",
-      text: "Please find the attached PDF.",
-      attachments: [
-        {
-          filename: "document.pdf",
-          content: pdfBuffer,
-          contentType: "application/pdf",
-        },
-      ],
-    };
+    // console.log("i am 116",session?.id)
+    // // return pdfBuffer;
+    // // const browser = await puppeteer.launch({
+    // //   executablePath: process.env.CHROMIUM_PATH || "/usr/bin/chromium",
+    // //   args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    // //   headless: true,
+    // // });
+    // // console.log("Browser launched successfully.",session.id);
     
-    // Step 5: Send the email
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error("Error sending email:", error);
-      } else {
-        console.log("Email sent:", info.response);
-      }
-    });
+    // // const page = await browser.newPage();
+    // // console.log("New page created.",session.id);
+  
+    // // await page.setContent(htmlContent, { waitUntil: "networkidle0" });
+    // // console.log("HTML content set.",session.id);
+  
+    // // const pdfBuffer = await page.pdf({ format: "A4" });
+    // // console.log("PDF generated successfully.",session.id);
+  
+    // // await browser.close();
+    // const mailOptions = {
+    //   from: process.env.SENDER_EMAIL,
+    //   to: userSentEmail.email,
+    //   subject: "Your PDF Document",
+    //   text: "Please find the attached PDF.",
+    //   attachments: [
+    //     {
+    //       filename: "document.pdf",
+    //       content: pdfBuffer,
+    //       contentType: "application/pdf",
+    //     },
+    //   ],
+    // };
     
-    console.log("i am 141",session?.id)
+    // // Step 5: Send the email
+    // transporter.sendMail(mailOptions, (error, info) => {
+    //   if (error) {
+    //     console.error("Error sending email:", error);
+    //   } else {
+    //     console.log("Email sent:", info.response);
+    //   }
+    // });
+    
+    // console.log("i am 141",session?.id)
     cart.items = [];
     cart.totalAmount = 0;
     await cart.save();
