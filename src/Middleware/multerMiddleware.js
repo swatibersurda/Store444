@@ -3,7 +3,8 @@ import multer from "multer";
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     // store locally your files here.
-    cb(null, "./public/temp");
+    // cb(null, "./public/temp");
+    cb(null, "/tmp");
   },
   filename: function (req, file, cb) {
     // dont need to cretae file unique name as we are deleting the file once we get link or it is not created

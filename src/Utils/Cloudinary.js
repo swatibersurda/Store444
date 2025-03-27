@@ -13,6 +13,7 @@ cloudiary.config({
 // when link created then will delete it from the server or public assests 
 // folder.
 const uploadCloudinary=async(localFilePath)=>{
+    console.log(localFilePath)
     try{
         if(!localFilePath) return null;
         // upload file on cloudinary.
