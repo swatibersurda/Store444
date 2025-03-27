@@ -86,10 +86,11 @@ export const placeOrder = async (req, res, next) => {
     // 2nd step create ejs file
     // 3rd step pdf create
     // 4th step node mailer sent mail.
-    
+    console.log("i am at 89")
     const xy = cart.items.forEach((item) =>
       updateStock(item.productId._id, item.quantity)
     );
+    console.log("i am at 93")
     // we need to send that order which we saved then need to send it for pdf creation.
     let sendUser = await Order.findOne({ _id:datam?._id }).populate({
       path: "items.productId",
