@@ -175,17 +175,21 @@ export const findUserByToken = async (req, res,next) => {
 
 export const addProfilePic=async(req,res,next)=>{
   const {email,id,phone}=req.body
+  console.log(email,id,phone)
   try {
     const pic=req.file?.path;
+    console.log(pic,"i am pic")
     if(!pic){
       return next(ErrorHandler("profile pic required",400))
     }
     // making clou link..
     const picLink=await uploadCloudinary(pic)
+    console.log(picLink?.url)
     if(!picLink){
       return next (new ErrorHandler("Failedd to upload img on cloudinary",500 ))
     }
     const user=await User.findByIdAndUpdate(id,{pic:picLink?.url,phone:phone},{new:true})
+    console.log(user,"i am user after save")
     if(!user){
       return next(new ErrorHandler("User not found!!"))
     }
