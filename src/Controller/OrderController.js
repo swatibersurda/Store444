@@ -98,12 +98,16 @@ export const placeOrder = async (req, res, next) => {
     });
     console.log("i am 99",session?.id)
     const userSentEmail = await User.findById({ _id: userId });
+    console.log("i am 101",session?.id)
+
     const htmlContent = await ejs.renderFile(
       path.join("src/views", "index.ejs"),
       { data: sendUser }
-    );    const browser = await puppeteer.launch();
+    );   
+     const browser = await puppeteer.launch();
+    console.log("i am 108",session?.id)
     const page = await browser.newPage();
-    console.log("i am 106",session?.id)
+    console.log("i am 110",session?.id)
     
     // // Set the HTML content in the page
     await page.setContent(htmlContent, { waitUntil: "networkidle0" });
