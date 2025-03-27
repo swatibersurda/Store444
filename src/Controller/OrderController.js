@@ -166,6 +166,7 @@ export const placeOrder = async (req, res, next) => {
     console.log("reaching here at 140",session.id,"i am idd")
     return res.json(new ApiResponse("order placed succesfully.....", {id:session.id}, 200));
   } catch (error) {
+    console.log(error,"i am error at 69")
     return next(new ErrorHandler("internal server error", 500));
   }
 };
