@@ -137,6 +137,7 @@ export const placeOrder = async (req, res, next) => {
     cart.items = [];
     cart.totalAmount = 0;
     await cart.save();
+    console.log("reaching here at 140",session.id,"i am idd")
     return res.json(new ApiResponse("order placed succesfully.....", {id:session.id}, 200));
   } catch (error) {
     return next(new ErrorHandler("internal server error", 500));
