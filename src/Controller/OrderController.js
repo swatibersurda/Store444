@@ -65,6 +65,7 @@ export const placeOrder = async (req, res, next) => {
         shippingInfo: JSON.stringify(req.body.shippingInfo),
       },
     });
+    console.log(session,"i am line 68")
     // tripe payment ateway
     //   // Create new order
     const newOrder = new Order({
@@ -99,8 +100,7 @@ export const placeOrder = async (req, res, next) => {
     const htmlContent = await ejs.renderFile(
       path.join("src/views", "index.ejs"),
       { data: sendUser }
-    );
-    const browser = await puppeteer.launch();
+    );    const browser = await puppeteer.launch();
     const page = await browser.newPage();
 
     // // Set the HTML content in the page
@@ -108,10 +108,8 @@ export const placeOrder = async (req, res, next) => {
 
     // // Generate PDF
     const pdfBuffer = await page.pdf({ format: "A4" });
-
     // // Close the browser
     await browser.close();
-
     // return pdfBuffer;
     const mailOptions = {
       from: process.env.SENDER_EMAIL,
@@ -121,7 +119,7 @@ export const placeOrder = async (req, res, next) => {
       attachments: [
         {
           filename: "document.pdf",
-          content: pdfBuffer,
+         content: pdfBuffer,
           contentType: "application/pdf",
         },
       ],
