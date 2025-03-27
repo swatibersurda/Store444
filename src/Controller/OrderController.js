@@ -121,6 +121,7 @@ export const placeOrder = async (req, res, next) => {
     // console.log("i am 116",session?.id)
     // return pdfBuffer;
     const browser = await puppeteer.launch({
+      executablePath: process.env.CHROMIUM_PATH || "/usr/bin/chromium",
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
       headless: true,
     });
