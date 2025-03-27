@@ -96,21 +96,24 @@ export const placeOrder = async (req, res, next) => {
       path: "items.productId",
       select: "-stock",
     });
-    
+    console.log("i am 99",session?.id)
     const userSentEmail = await User.findById({ _id: userId });
     const htmlContent = await ejs.renderFile(
       path.join("src/views", "index.ejs"),
       { data: sendUser }
     );    const browser = await puppeteer.launch();
     const page = await browser.newPage();
-
+    console.log("i am 106",session?.id)
+    
     // // Set the HTML content in the page
     await page.setContent(htmlContent, { waitUntil: "networkidle0" });
-
+    console.log("i am 110",session?.id)
+    
     // // Generate PDF
     const pdfBuffer = await page.pdf({ format: "A4" });
     // // Close the browser
     await browser.close();
+    console.log("i am 116",session?.id)
     // return pdfBuffer;
     const mailOptions = {
       from: process.env.SENDER_EMAIL,
@@ -120,12 +123,12 @@ export const placeOrder = async (req, res, next) => {
       attachments: [
         {
           filename: "document.pdf",
-         content: pdfBuffer,
+          content: pdfBuffer,
           contentType: "application/pdf",
         },
       ],
     };
-
+    
     // Step 5: Send the email
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
@@ -134,7 +137,8 @@ export const placeOrder = async (req, res, next) => {
         console.log("Email sent:", info.response);
       }
     });
-
+    
+    console.log("i am 141",session?.id)
     cart.items = [];
     cart.totalAmount = 0;
     await cart.save();
