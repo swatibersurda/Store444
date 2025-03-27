@@ -12,7 +12,7 @@ dotenv.config({ path: "./.env" });
 import pdf from "html-pdf";
 import path from "path";
 import nodemailer from "nodemailer";
-import puppeteer from "puppeteer-core";
+import puppeteer from "puppeteer";
 import { User } from "../Model/userModel.js";
 import ApiResponse from "../Utils/ApiResponse.js";
 
@@ -105,38 +105,38 @@ export const placeOrder = async (req, res, next) => {
       { data: sendUser }
     );   
     console.log("i am 107777",session?.id)
-    //  const browser = await puppeteer.launch();
-    // console.log("i am 108",session?.id)
-    // const page = await browser.newPage();
-    // console.log("i am 110",session?.id)
-    
-    // // // Set the HTML content in the page
-    // await page.setContent(htmlContent, { waitUntil: "networkidle0" });
-    // console.log("i am 110",session?.id)
-    
-    // // // Generate PDF
-    // const pdfBuffer = await page.pdf({ format: "A4" });
-    // // // Close the browser
-    // await browser.close();
-    // console.log("i am 116",session?.id)
-    // return pdfBuffer;
-    const browser = await puppeteer.launch({
-      executablePath: process.env.CHROMIUM_PATH || "/usr/bin/chromium",
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
-      headless: true,
-    });
-    console.log("Browser launched successfully.",session.id);
-    
+     const browser = await puppeteer.launch();
+    console.log("i am 108",session?.id)
     const page = await browser.newPage();
-    console.log("New page created.",session.id);
-  
+    console.log("i am 110",session?.id)
+    
+    // // Set the HTML content in the page
     await page.setContent(htmlContent, { waitUntil: "networkidle0" });
-    console.log("HTML content set.",session.id);
-  
+    console.log("i am 110",session?.id)
+    
+    // // Generate PDF
     const pdfBuffer = await page.pdf({ format: "A4" });
-    console.log("PDF generated successfully.",session.id);
-  
+    // // Close the browser
     await browser.close();
+    console.log("i am 116",session?.id)
+    // return pdfBuffer;
+    // const browser = await puppeteer.launch({
+    //   executablePath: process.env.CHROMIUM_PATH || "/usr/bin/chromium",
+    //   args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    //   headless: true,
+    // });
+    // console.log("Browser launched successfully.",session.id);
+    
+    // const page = await browser.newPage();
+    // console.log("New page created.",session.id);
+  
+    // await page.setContent(htmlContent, { waitUntil: "networkidle0" });
+    // console.log("HTML content set.",session.id);
+  
+    // const pdfBuffer = await page.pdf({ format: "A4" });
+    // console.log("PDF generated successfully.",session.id);
+  
+    // await browser.close();
     const mailOptions = {
       from: process.env.SENDER_EMAIL,
       to: userSentEmail.email,

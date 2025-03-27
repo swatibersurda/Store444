@@ -30,7 +30,6 @@
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "puppeteer": "^23.8.0",
-    "puppeteer-core": "^24.4.0",
     "stripe": "^17.6.0",
     "uuid": "^10.0.0"
   }
