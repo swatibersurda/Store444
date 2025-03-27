@@ -104,7 +104,7 @@ export const placeOrder = async (req, res, next) => {
       path.join("src/views", "index.ejs"),
       { data: sendUser }
     );   
-    console.log("i am 107",session?.id)
+    console.log("i am 107777",session?.id)
     //  const browser = await puppeteer.launch();
     // console.log("i am 108",session?.id)
     // const page = await browser.newPage();
